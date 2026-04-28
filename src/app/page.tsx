@@ -270,7 +270,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="relative z-10 text-center py-8 text-gray-600 text-xs">
-        Built with Groq AI, Next.js & jscodeshift •{" "}
+        Built with Claude AI, Next.js & jscodeshift •{" "}
         <a
           href="https://dorahacks.io"
           className="text-indigo-400/60 hover:text-indigo-400 transition-colors"

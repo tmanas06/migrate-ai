@@ -9,7 +9,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square&logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?style=flat-square&logo=typescript)](https://typescriptlang.org)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8?style=flat-square&logo=tailwindcss)](https://tailwindcss.com)
-[![Groq AI](https://img.shields.io/badge/Groq-Llama--3.3--70b--versatile-orange?style=flat-square)](https://groq.com)
+[![Claude AI](https://img.shields.io/badge/Claude-Anthropic--Claude--3.5--Sonnet-7c6af7?style=flat-square)](https://anthropic.com)
 [![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-latest-000?style=flat-square)](https://ui.shadcn.com)
 
 ---
@@ -37,7 +37,7 @@ No more spending days on repetitive upgrade work. Just paste, click, migrate.
 │                  │     │                  │     │                  │
 │   1. PASTE URL   │────▶│  2. AI ANALYZES  │────▶│  3. GET RESULTS  │
 │                  │     │                  │     │                  │
-│  Enter GitHub    │     │  Groq AI +       │     │  Beautiful diffs │
+│  Enter GitHub    │     │  Claude AI +       │     │  Beautiful diffs │
 │  repo URL and    │     │  jscodeshift     │     │  PR description  │
 │  select type     │     │  codemods run    │     │  Patch download  │
 │                  │     │                  │     │                  │
@@ -45,7 +45,7 @@ No more spending days on repetitive upgrade work. Just paste, click, migrate.
 ```
 
 1. **Paste** — Enter a public GitHub repo URL and select your migration type
-2. **Analyze** — The app clones the repo, runs AST codemods, and sends files to Groq AI for deep analysis
+2. **Analyze** — The app clones the repo, runs AST codemods, and sends files to Claude AI for deep analysis
 3. **Results** — Get a split-pane diff viewer, stats, breaking changes, downloadable `.patch` file, and a professional PR description
 
 ---
@@ -103,7 +103,7 @@ Don't have a repo handy? Click **"✨ Try Demo"** on the home page to see a full
 |-------|-----------|
 | **Framework** | Next.js 15 (App Router) + TypeScript |
 | **Styling** | Tailwind CSS v4 + shadcn/ui |
-| **AI** | Groq (Llama-3.3-70b-versatile) |
+| **AI** | Anthropic Claude 3.5 Sonnet |
 | **Codemods** | jscodeshift + custom AST visitors |
 | **Diffs** | `diff` package for unified diffs |
 | **Git** | `simple-git` for repo cloning |
@@ -130,7 +130,7 @@ src/
 │   ├── MigrationLog.tsx      # Terminal-style log output
 │   └── MigrationSelector.tsx # Migration type dropdown
 └── lib/
-    ├── ai.ts                 # Groq AI API wrapper
+    ├── ai.ts                 # Claude AI API wrapper
     ├── git.ts                # Repo cloning utilities
     ├── diff.ts               # Diff generation
     ├── files.ts              # File reader
@@ -153,7 +153,7 @@ src/
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `GROQ_API_KEY` | For AI features | Your Groq API key for Llama. Demo mode works without it. |
+| `GROQ_API_KEY` | For AI features | Your Anthropic/Claude API key. Demo mode works without it. |
 
 ---
 
@@ -188,7 +188,7 @@ MIT © 2026
 
 <div align="center">
 
-**Built with Groq AI, Next.js & jscodeshift**
+**Built with Claude AI, Next.js & jscodeshift**
 
 [⬆ Back to top](#-migrateai)
 
