@@ -5,6 +5,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import DiffViewer from "@/components/DiffViewer";
+import Logo from "@/components/Logo";
 import { MIGRATION_OPTIONS } from "@/lib/types";
 import type { MigrationResult } from "@/lib/types";
 
@@ -96,27 +97,26 @@ export default function ResultsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#070b11] flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans">
       {/* Header */}
-      <header className="border-b border-white/5 px-8 py-4 shrink-0">
+      <header className="border-b border-border px-8 py-4 shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <button
             onClick={() => router.push("/")}
             className="flex items-center gap-3"
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center text-white font-bold text-xs">
-              M
-            </div>
-            <span className="text-lg font-bold text-white tracking-tight">
+            <Logo size={32} />
+            <span className="text-lg font-bold text-foreground tracking-tight">
               Migrate<span className="text-indigo-400">AI</span>
             </span>
           </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-6">
+            <ThemeSwitcher />
             <button
               onClick={() => router.push("/")}
-              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-300 text-sm
-                hover:bg-white/10 hover:text-white transition-all"
+              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-muted-foreground text-sm
+                hover:bg-white/10 hover:text-foreground transition-all"
             >
               ← New Migration
             </button>
@@ -131,7 +131,7 @@ export default function ResultsPage() {
             {migrationOption && (
               <>
                 <span className="text-2xl">{migrationOption.icon}</span>
-                <h1 className="text-xl font-bold text-white">
+                <h1 className="text-xl font-bold text-foreground">
                   {migrationOption.label} Migration Results
                 </h1>
               </>
@@ -229,7 +229,7 @@ export default function ResultsPage() {
         {activeTab === "pr" && (
           <div className="max-w-4xl mx-auto px-8 py-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">
+              <h2 className="text-lg font-semibold text-foreground">
                 PR Description
               </h2>
               <div className="flex items-center gap-2">
@@ -274,7 +274,7 @@ export default function ResultsPage() {
         {activeTab === "patch" && (
           <div className="max-w-4xl mx-auto px-8 py-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">Patch File</h2>
+              <h2 className="text-lg font-semibold text-foreground">Patch File</h2>
               <button
                 onClick={downloadPatch}
                 className="px-4 py-2 rounded-lg bg-green-500/20 border border-green-500/30 text-green-300 text-sm
@@ -346,7 +346,7 @@ function StatCard({
         <span className="text-sm">{icon}</span>
         <span className="text-xs text-gray-400">{label}</span>
       </div>
-      <p className="text-xl font-bold text-white font-mono">{value}</p>
+      <p className="text-xl font-bold text-foreground font-mono">{value}</p>
     </div>
   );
 }
@@ -383,7 +383,7 @@ function TabButton({
       onClick={onClick}
       className={`px-4 py-3 text-sm font-medium border-b-2 transition-all ${
         active
-          ? "border-indigo-400 text-white"
+          ? "border-indigo-400 text-foreground"
           : "border-transparent text-gray-500 hover:text-gray-300 hover:border-white/10"
       }`}
     >

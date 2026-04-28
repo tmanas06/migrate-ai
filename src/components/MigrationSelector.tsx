@@ -18,7 +18,7 @@ export default function MigrationSelector({
     <div className="relative">
       <label
         htmlFor="migration-type"
-        className="block text-sm font-medium text-gray-400 mb-2"
+        className="block text-sm font-medium text-muted-foreground mb-2"
       >
         Migration Type
       </label>
@@ -27,9 +27,9 @@ export default function MigrationSelector({
           id="migration-type"
           value={value}
           onChange={(e) => onChange(e.target.value as MigrationType)}
-          className="w-full appearance-none bg-[#0d1117] border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm font-medium
+          className="w-full appearance-none bg-card border border-border rounded-xl px-4 py-3.5 text-foreground text-sm font-medium
             focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50
-            hover:border-white/20 transition-all cursor-pointer"
+            hover:border-border transition-all cursor-pointer"
         >
 
           {MIGRATION_OPTIONS.map((opt) => (
@@ -41,7 +41,7 @@ export default function MigrationSelector({
         {/* Custom arrow */}
         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
           <svg
-            className="w-5 h-5 text-gray-400"
+            className="w-5 h-5 text-muted-foreground"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -66,15 +66,15 @@ export default function MigrationSelector({
               <div className="flex items-start gap-3">
                 <span className="text-2xl">{opt.icon}</span>
                 <div>
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-medium text-foreground">
                     {opt.from} → {opt.to}
                   </p>
-                  <p className="text-xs text-gray-400 mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {opt.description}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     Files:{" "}
-                    <span className="font-mono text-gray-400">
+                    <span className="font-mono text-muted-foreground">
                       {opt.fileExtensions.join(", ")}
                     </span>
                   </p>

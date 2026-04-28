@@ -5,6 +5,8 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import MigrationLog from "@/components/MigrationLog";
+import Logo from "@/components/Logo";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 import type { MigrateRequest, MigrationResult, LogEvent } from "@/lib/types";
 import { MIGRATION_OPTIONS } from "@/lib/types";
 
@@ -130,28 +132,29 @@ export default function MigratePage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-[#070b11] flex flex-col">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Header */}
-      <header className="border-b border-white/5 px-8 py-4">
+      <header className="border-b border-border px-8 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors"
+            className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center text-white font-bold text-xs">
-              M
-            </div>
-            <span className="text-lg font-bold text-white tracking-tight">
+            <Logo size={32} />
+            <span className="text-lg font-bold text-foreground tracking-tight">
               Migrate<span className="text-indigo-400">AI</span>
             </span>
           </button>
 
-          {migrationOption && (
-            <div className="flex items-center gap-2 text-sm text-gray-400">
-              <span className="text-lg">{migrationOption.icon}</span>
-              <span>{migrationOption.label}</span>
-            </div>
-          )}
+          <div className="flex items-center gap-6">
+            <ThemeSwitcher />
+            {migrationOption && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="text-lg">{migrationOption.icon}</span>
+                <span>{migrationOption.label}</span>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -160,7 +163,7 @@ export default function MigratePage() {
         <div className="max-w-3xl w-full mx-auto">
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               {isComplete
                 ? "Migration Complete ✓"
                 : error
@@ -168,7 +171,7 @@ export default function MigratePage() {
                 : "Migrating..."}
             </h1>
             {request && (
-              <p className="text-gray-400 text-sm">
+              <p className="text-muted-foreground text-sm">
                 {request.isDemo
                   ? "Running demo migration"
                   : request.repoUrl}
@@ -188,7 +191,7 @@ export default function MigratePage() {
               <p className="text-red-400 text-sm mb-4">{error}</p>
               <button
                 onClick={() => router.push("/")}
-                className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-sm font-medium
+                className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-foreground text-sm font-medium
                   hover:bg-white/10 transition-all"
               >
                 ← Back to Home

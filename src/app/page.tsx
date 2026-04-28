@@ -5,6 +5,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import MigrationSelector from "@/components/MigrationSelector";
+import Logo from "@/components/Logo";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { MIGRATION_OPTIONS } from "@/lib/types";
 import type { MigrationType } from "@/lib/types";
 
@@ -36,10 +38,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans overflow-x-hidden relative">
       {/* Animated gradient background */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[#070b11]" />
+        <div className="absolute inset-0 bg-background" />
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[128px] animate-float" />
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[128px] animate-float-delayed" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/5 rounded-full blur-[160px] animate-pulse-slow" />
@@ -56,33 +58,34 @@ export default function HomePage() {
       {/* Nav */}
       <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center text-white font-bold text-sm">
-            M
-          </div>
-          <span className="text-xl font-bold text-white tracking-tight">
+          <Logo size={36} />
+          <span className="text-xl font-bold text-foreground tracking-tight">
             Migrate<span className="text-indigo-400">AI</span>
           </span>
         </div>
         <div className="flex items-center gap-6">
-          <a
-            href="https://dorahacks.io"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-gray-400 hover:text-white transition-colors"
-          >
-            Built for Boring AI Hackathon
-          </a>
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-gray-400 hover:text-white transition-colors flex items-center gap-1.5"
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-            </svg>
-            GitHub
-          </a>
+          <ThemeSwitcher />
+          <div className="hidden md:flex items-center gap-6">
+            <a
+              href="https://dorahacks.io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Built for Boring AI Hackathon
+            </a>
+            <a
+              href="https://github.com/migrateai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+              </svg>
+              GitHub
+            </a>
+          </div>
         </div>
       </nav>
 
@@ -105,7 +108,7 @@ export default function HomePage() {
             Let AI do them.
           </h1>
 
-          <p className="text-lg text-gray-400 max-w-xl mx-auto mb-12 animate-fadeInUp animation-delay-200">
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-12 animate-fadeInUp animation-delay-200">
             Paste a GitHub repo, pick a migration type, and watch AI transform
             your codebase in seconds. Beautiful diffs, download patches, and
             auto-generated PR descriptions.
@@ -117,7 +120,7 @@ export default function HomePage() {
             <div className="mb-6">
               <label
                 htmlFor="repo-url"
-                className="block text-sm font-medium text-gray-400 mb-2"
+                className="block text-sm font-medium text-muted-foreground mb-2"
               >
                 GitHub Repository URL
               </label>
@@ -130,9 +133,9 @@ export default function HomePage() {
                   setRepoUrl(e.target.value);
                   setError("");
                 }}
-                className="w-full bg-[#070b11] border border-white/10 rounded-xl px-4 py-3.5 text-white placeholder-gray-600 text-sm font-mono
+                className="w-full bg-card border border-border rounded-xl px-4 py-3.5 text-foreground placeholder-gray-600 text-sm font-mono
                   focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50
-                  hover:border-white/20 transition-all"
+                  hover:border-border transition-all"
               />
             </div>
 
@@ -160,7 +163,7 @@ export default function HomePage() {
                 id="migrate-button"
                 onClick={() => handleMigrate(false)}
                 disabled={isLoading}
-                className="flex-1 relative group px-6 py-4 rounded-xl font-semibold text-white text-sm
+                className="flex-1 relative group px-6 py-4 rounded-xl font-semibold text-foreground text-sm
                   bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400
                   shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40
                   transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
@@ -207,7 +210,7 @@ export default function HomePage() {
                 disabled={isLoading}
                 className="px-6 py-4 rounded-xl font-semibold text-sm
                   bg-white/5 border border-white/10 text-gray-300
-                  hover:bg-white/10 hover:border-white/20 hover:text-white
+                  hover:bg-white/10 hover:border-white/20 hover:text-foreground
                   transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
                   active:scale-[0.98]"
               >
@@ -229,14 +232,14 @@ export default function HomePage() {
                   className={`group flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left
                     ${
                       migrationType === opt.id
-                        ? "bg-indigo-500/10 border-indigo-500/30 text-white"
-                        : "bg-white/[0.02] border-white/5 text-gray-400 hover:bg-white/[0.05] hover:border-white/10 hover:text-gray-200"
+                        ? "bg-indigo-500/10 border-indigo-500/30 text-foreground"
+                        : "bg-white/[0.02] border-white/5 text-muted-foreground hover:bg-white/[0.05] hover:border-white/10 hover:text-gray-200"
                     }`}
                 >
                   <span className="text-xl">{opt.icon}</span>
                   <div>
                     <p className="text-sm font-medium">{opt.label}</p>
-                    <p className="text-xs text-gray-500 group-hover:text-gray-400 transition-colors">
+                    <p className="text-xs text-gray-500 group-hover:text-muted-foreground transition-colors">
                       {opt.from} → {opt.to}
                     </p>
                   </div>
@@ -248,17 +251,17 @@ export default function HomePage() {
           {/* Stats / social proof */}
           <div className="mt-16 flex items-center justify-center gap-12 text-gray-500 animate-fadeInUp animation-delay-800">
             <div className="text-center">
-              <p className="text-2xl font-bold text-white">6</p>
+              <p className="text-2xl font-bold text-foreground">6</p>
               <p className="text-xs mt-1">Migration Types</p>
             </div>
             <div className="w-px h-10 bg-white/10" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-white">AI + AST</p>
+              <p className="text-2xl font-bold text-foreground">AI + AST</p>
               <p className="text-xs mt-1">Dual Engine</p>
             </div>
             <div className="w-px h-10 bg-white/10" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-white">1-Click</p>
+              <p className="text-2xl font-bold text-foreground">1-Click</p>
               <p className="text-xs mt-1">PR Ready</p>
             </div>
           </div>
