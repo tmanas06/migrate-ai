@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "functions": {
+    "app/api/migrate/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/generate-pr/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/stream-logs/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}
