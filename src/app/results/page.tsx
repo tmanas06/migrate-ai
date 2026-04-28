@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import DiffViewer from "@/components/DiffViewer";
 import Logo from "@/components/Logo";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 import { MIGRATION_OPTIONS } from "@/lib/types";
 import type { MigrationResult } from "@/lib/types";
 
