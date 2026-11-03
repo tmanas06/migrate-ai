@@ -414,7 +414,7 @@ export function generateDemoResult(migrationType: MigrationType): MigrationResul
   const fileChanges = demoFiles.map((file) => {
     let migratedContent = file.content;
 
-    switch (migrationType) {
+    switch (type) {
       case "react-17-to-19":
         migratedContent = migratedContent
           .replace(/import React from 'react';\n\n/g, "")

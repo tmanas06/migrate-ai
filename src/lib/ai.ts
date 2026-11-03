@@ -6,13 +6,116 @@ import type { MigrationPlan, MigrationType } from "./types";
 
 const getClient = () => {
   const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) {
+  if (!apiKey || apiKey.includes("ZZZZ") || apiKey === "your_groq_api_key_here") {
     throw new Error(
-      "GROQ_API_KEY is not set. Add it to your .env file."
+      "GROQ_API_KEY is not configured or is a placeholder. Please set a valid key in .env or .env.local"
     );
   }
   return new Groq({ apiKey });
 };
+
+type ChatParams = Omit<Parameters<Groq["chat"]["completions"]["create"]>[0], "model"> & {
+  model?: string;
+};
+
+let activeModelsCache: string[] | null = null;
+
+/**
+ * Fetch available models dynamically from Groq or return preferred fallbacks.
+ */
+async function getAvailableModels(client: Groq): Promise<string[]> {
+  if (activeModelsCache && activeModelsCache.length > 0) {
+    return activeModelsCache;
+  }
+
+  try {
+    const list = await client.models.list();
+    const modelIds = list.data.map((m) => m.id);
+    console.log("[Groq] Available active models for API key:", modelIds);
+
+    // Filter out audio, whisper, guard, vision-only
+    const chatModels = modelIds.filter(
+      (id) =>
+        !id.includes("whisper") &&
+        !id.includes("guard") &&
+        !id.includes("tts") &&
+        !id.includes("embed")
+    );
+
+    if (chatModels.length > 0) {
+      activeModelsCache = chatModels;
+      return chatModels;
+    }
+  } catch (err) {
+    console.warn("[Groq] Could not query models list dynamically:", err);
+  }
+
+  // Known fallback candidates
+  return [
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "mixtral-8x7b-32768",
+    "gemma2-9b-it",
+  ];
+}
+
+/**
+ * Execute chat completion with fallback models if the primary model is unavailable or decommissioned.
+ */
+async function createChatCompletionWithFallback(
+  client: Groq,
+  params: ChatParams
+): Promise<Groq.Chat.ChatCompletion> {
+  const availableModels = await getAvailableModels(client);
+
+  const userModel = process.env.GROQ_MODEL;
+  const modelsToTry: string[] = [];
+
+  if (userModel) {
+    modelsToTry.push(userModel);
+  }
+
+  // Add available models in order
+  for (const m of availableModels) {
+    if (!modelsToTry.includes(m)) {
+      modelsToTry.push(m);
+    }
+  }
+
+  let lastError: unknown;
+  for (const model of modelsToTry) {
+    try {
+      console.log(`[Groq] Attempting completion with model: ${model}`);
+      return (await client.chat.completions.create({
+        ...params,
+        model,
+        stream: false,
+      })) as Groq.Chat.ChatCompletion;
+    } catch (err: unknown) {
+      lastError = err;
+      const status = (err as { status?: number })?.status;
+      const message = (err as { message?: string })?.message || "";
+      const code = (err as { error?: { code?: string } })?.error?.code || "";
+
+      const isModelError =
+        status === 404 ||
+        status === 400 ||
+        code === "model_decommissioned" ||
+        code === "model_not_found" ||
+        message.includes("model_not_found") ||
+        message.includes("decommissioned") ||
+        message.includes("does not exist") ||
+        message.includes("access");
+
+      if (isModelError) {
+        console.warn(`[Groq] Model '${model}' failed (${code || status}): ${message}. Attempting fallback model...`);
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastError;
+}
 
 /** Mapping from migration type to human-readable source → target labels */
 const MIGRATION_LABELS: Record<MigrationType, { from: string; to: string }> = {
@@ -51,8 +154,7 @@ Important rules:
 - breakingChanges should list any breaking changes users need to be aware of
 - Return ONLY the JSON object, no markdown fences, no explanations. Do not include any text outside the JSON.`;
 
-  const response = await client.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
+  const response = await createChatCompletionWithFallback(client, {
     messages: [
       {
         role: "system",
@@ -111,8 +213,7 @@ export async function generatePRDescription(
 
   const systemPrompt = `You are a senior engineer writing a GitHub PR description. Write a clear, professional PR description for this automated migration. Use markdown. Include: ## Summary, ## Changes, ## Testing, ## Breaking Changes. Be specific about what changed and why.`;
 
-  const response = await client.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
+  const response = await createChatCompletionWithFallback(client, {
     messages: [
       {
         role: "system",
@@ -143,18 +244,73 @@ Write the PR description now.`,
 }
 
 /**
+ * Heuristically detect migration type from files and package.json when AI is unavailable.
+ */
+export function detectMigrationHeuristically(
+  files: { path: string; content: string }[]
+): MigrationType {
+  const pkgFile = files.find((f) => f.path === "package.json");
+  const pkgContent = pkgFile?.content || "";
+
+  // 1. Python 2 to 3
+  if (files.some((f) => f.path.endsWith(".py"))) {
+    return "python-2-to-3";
+  }
+
+  // 2. Tailwind 3 to 4
+  if (
+    files.some((f) => f.path.includes("tailwind.config")) ||
+    pkgContent.includes('"tailwindcss"')
+  ) {
+    if (!files.some((f) => f.content.includes('@import "tailwindcss"') || f.content.includes("@theme"))) {
+      return "tailwind-3-to-4";
+    }
+  }
+
+  // 3. Jest to Vitest
+  if (
+    pkgContent.includes('"jest"') ||
+    files.some((f) => f.path.includes("jest.config") || f.content.includes("jest.fn") || f.content.includes("jest.mock"))
+  ) {
+    return "jest-to-vitest";
+  }
+
+  // 4. REST to tRPC
+  if (
+    files.some((f) => f.path.includes("pages/api/") || (f.path.includes("app/api/") && !f.path.includes("api/trpc")))
+  ) {
+    return "rest-to-trpc";
+  }
+
+  // 5. CommonJS to ESM
+  const hasRequireOrModuleExports = files.some(
+    (f) =>
+      /(?:^|\s)require\s*\(/.test(f.content) ||
+      /module\.exports\s*=/.test(f.content) ||
+      /exports\.\w+\s*=/.test(f.content)
+  );
+  if (hasRequireOrModuleExports && !pkgContent.includes('"type": "module"')) {
+    return "cjs-to-esm";
+  }
+
+  // 6. React 17 to 19 (default for web/React repos)
+  return "react-17-to-19";
+}
+
+/**
  * Automatically detect the best migration type based on repository file structure and metadata.
  */
 export async function autoDetectMigration(
   files: { path: string; content: string }[]
 ): Promise<MigrationType> {
-  const client = getClient();
+  try {
+    const client = getClient();
 
-  // Create a summary of the repository for the AI
-  const fileList = files.map(f => f.path).join("\n");
-  const packageJson = files.find(f => f.path === "package.json")?.content || "No package.json found";
-  
-  const systemPrompt = `You are an expert software architect. Analyze the provided repository metadata and identify which of the following migration types is MOST appropriate for this codebase.
+    // Create a summary of the repository for the AI
+    const fileList = files.map(f => f.path).join("\n");
+    const packageJson = files.find(f => f.path === "package.json")?.content || "No package.json found";
+    
+    const systemPrompt = `You are an expert software architect. Analyze the provided repository metadata and identify which of the following migration types is MOST appropriate for this codebase.
 
 Supported Migration Types:
 1. react-17-to-19: If the project uses React 17 or older and has many .tsx/.jsx files.
@@ -166,36 +322,39 @@ Supported Migration Types:
 
 Return ONLY the ID of the migration type (e.g., "react-17-to-19"). If none seem highly appropriate, default to "react-17-to-19" if it's a web project or "cjs-to-esm" if it's node. If completely unsure, return "react-17-to-19".`;
 
-  const response = await client.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt,
-      },
-      {
-        role: "user",
-        content: `Repository Files:\n${fileList}\n\nPackage.json Content:\n${packageJson}`,
-      },
-    ],
-    temperature: 0.1,
-  });
+    const response = await createChatCompletionWithFallback(client, {
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: `Repository Files:\n${fileList}\n\nPackage.json Content:\n${packageJson}`,
+        },
+      ],
+      temperature: 0.1,
+    });
 
-  const detected = response.choices[0]?.message?.content?.trim() as MigrationType;
-  
-  // Validate detected type
-  const validTypes: MigrationType[] = [
-    "react-17-to-19",
-    "jest-to-vitest",
-    "cjs-to-esm",
-    "python-2-to-3",
-    "rest-to-trpc",
-    "tailwind-3-to-4",
-  ];
+    const detected = response.choices[0]?.message?.content?.trim() as MigrationType;
+    
+    // Validate detected type
+    const validTypes: MigrationType[] = [
+      "react-17-to-19",
+      "jest-to-vitest",
+      "cjs-to-esm",
+      "python-2-to-3",
+      "rest-to-trpc",
+      "tailwind-3-to-4",
+    ];
 
-  if (validTypes.includes(detected)) {
-    return detected;
+    if (validTypes.includes(detected)) {
+      return detected;
+    }
+
+    return detectMigrationHeuristically(files);
+  } catch (error) {
+    console.warn("AI auto-detection unavailable, falling back to heuristics:", error instanceof Error ? error.message : error);
+    return detectMigrationHeuristically(files);
   }
-
-  return "react-17-to-19"; // Fallback
 }

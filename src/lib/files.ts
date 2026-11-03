@@ -57,6 +57,7 @@ export async function readRepoFiles(
 
         // Check if this file has a relevant extension
         const isRelevant = relevantExtensions.some((re) => {
+          if (re === "*") return true;
           const normalizedRe = re.startsWith(".") ? re : `.${re}`;
           return entry.name.endsWith(normalizedRe);
         });

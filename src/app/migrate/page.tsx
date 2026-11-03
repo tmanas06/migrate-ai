@@ -38,8 +38,16 @@ export default function MigratePage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Migration failed");
+        let errorMessage = "Migration failed";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.details
+            ? `${errorData.error}: ${errorData.details}`
+            : (errorData.error || errorMessage);
+        } catch {
+          errorMessage = `Server returned ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
       const result: MigrationResult = await response.json();

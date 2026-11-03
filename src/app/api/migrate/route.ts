@@ -123,7 +123,10 @@ export async function POST(request: NextRequest) {
       // Filter source files based on the detected migration type for efficiency
       sourceFiles = initialFiles.filter(f => 
         detectedOption.fileExtensions.includes("*") || 
-        detectedOption.fileExtensions.some(ext => f.path.endsWith(`.${ext}`)) ||
+        detectedOption.fileExtensions.some(ext => {
+          const normalized = ext.startsWith(".") ? ext : `.${ext}`;
+          return f.path.endsWith(normalized);
+        }) ||
         f.path === "package.json" ||
         f.path === "tailwind.config.js" ||
         f.path === "jest.config.js"
@@ -232,12 +235,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json<ApiError>(
         {
           error: "Migration failed",
-          details: error instanceof Error ? error.message : "Unknown error",
+          details: error instanceof Error
+            ? `${error.message}. Please check your GROQ_API_KEY in .env or .env.local.`
+            : "Unknown error during AI analysis",
         },
         { status: 500 }
       );
     }
   } catch (error) {
+    console.error("Internal error in POST /api/migrate:", error);
     if (repoPath) {
       await cleanupRepo(repoPath);
     }
